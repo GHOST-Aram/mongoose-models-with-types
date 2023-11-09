@@ -72,7 +72,6 @@ const identify = (doc: HydratedDocument<IUser, IUserMethods>) =>{
     // You can access all document properties 
     // and instance methods by including their interfaces as Generics
     // In the HydratedDocument Type
-    
     console.log(doc.full_name(),
     doc.to_string(),
     doc.last_name,
