@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 interface IProduct{
     marked_price: number,
@@ -13,9 +13,9 @@ interface IProductVirtuals{
     loss: number | false
 }
 
-type ProductModel = Model<IProduct,{},{},IProductVirtuals>
+type ProductModel = mongoose.Model<IProduct,{},{},IProductVirtuals>
 
-const productSchema: Schema = new Schema<
+const productSchema: mongoose.Schema = new mongoose.Schema<
 IProduct, ProductModel,{}, {}, IProductVirtuals>({
     marked_price:{
         type: Number,
@@ -52,9 +52,11 @@ productSchema.virtual('discount').get(function():number{
     return discount > 0 ? discount : 0
 })
 
-const Product: ProductModel = model<IProduct, ProductModel>(
-    'Product', productSchema)
-type HydratedProductDoc = HydratedDocument<IProduct, IProductVirtuals>
+const Product: ProductModel = mongoose.model<
+IProduct, ProductModel>('Product', productSchema)
+
+type HydratedProductDoc = mongoose.HydratedDocument<
+IProduct, IProductVirtuals>
 
 const product1: HydratedProductDoc = new Product({
     name: 'Motor Cycle',

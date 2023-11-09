@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 interface IVehicle {
     manufacturer: string,
@@ -17,9 +17,9 @@ interface IVehicleMethods{
 interface IVehicleVirtuals{
     age:number
 }
-type VehicleModel = Model<IVehicle, {}, IVehicleMethods, IVehicleVirtuals>
+type VehicleModel = mongoose.Model<IVehicle, {}, IVehicleMethods, IVehicleVirtuals>
 
-const vehicleSchema:Schema = new Schema<
+const vehicleSchema:mongoose.Schema = new mongoose.Schema<
 IVehicle, VehicleModel, IVehicleMethods,{}, IVehicleVirtuals>({
     manufacturer: {
         type: String,
@@ -52,7 +52,8 @@ IVehicle, VehicleModel, IVehicleMethods,{}, IVehicleVirtuals>({
 })
 
 vehicleSchema.method(
-    'calculateDepreciationRate', function(currentValue: number): number{
+    'calculateDepreciationRate', 
+    function(currentValue: number): number{
         const change = this.initialValue - currentValue
         // console.log(this.age)
         return (change /this.age )
@@ -62,10 +63,11 @@ vehicleSchema.virtual('age').get(function(): number{
     return new Date().getFullYear() - this.year_of_sale
 })
 
+const Vehicle: VehicleModel = mongoose.model<
+IVehicle, VehicleModel>('Vehicle', vehicleSchema)
 
-type HydratedVehicleDoc = HydratedDocument<IVehicle, IVehicleMethods & IVehicleVirtuals>
-
-const Vehicle: VehicleModel = model<IVehicle, VehicleModel>('Vehicle', vehicleSchema)
+type HydratedVehicleDoc = mongoose.HydratedDocument<
+IVehicle, IVehicleMethods & IVehicleVirtuals>
 
 const car: HydratedVehicleDoc = new Vehicle({
     year_of_assembly: 2009,
@@ -80,6 +82,7 @@ const car: HydratedVehicleDoc = new Vehicle({
 const getAge = (doc: HydratedVehicleDoc): number =>{
     return doc.age
 }
+
 console.log(car.calculateDepreciationRate(4855904))
 console.log("Age: ", getAge(car))
 

@@ -1,5 +1,4 @@
-import { HydratedDocument, get } from "mongoose"
-import { Model, Schema, model } from "mongoose"
+import  mongoose from "mongoose"
 
 interface IHouse{
     longitude: number
@@ -9,11 +8,12 @@ interface IHouse{
     washrooms: number
     bathrooms: number
 }
-type HouseModel = Model<IHouse>
+type HouseModel = mongoose.Model<IHouse>
 
-class HouseSchema extends Schema<IHouse, HouseModel>{} 
 
-const houseSchema: Schema = new HouseSchema(
+class HouseSchema extends mongoose.Schema<IHouse, HouseModel>{} 
+
+const houseSchema: mongoose.Schema = new HouseSchema(
     {
         longitude: Number,
         latitude: Number,
@@ -24,9 +24,10 @@ const houseSchema: Schema = new HouseSchema(
     }
 )
 
-const House: HouseModel = model<IHouse, HouseModel>('House', houseSchema)
+const House: HouseModel = mongoose.model<IHouse, HouseModel>('House', houseSchema)
 
-type HydratedHouseDoc = HydratedDocument<IHouse>
+type HydratedHouseDoc = mongoose.HydratedDocument<IHouse>
+
 const cabin: HydratedHouseDoc = new House({
     longitude: 45,
     latitude: -0.2,
@@ -44,8 +45,7 @@ console.log(
     cabin.washrooms,
 )
 
-
-House.findById('7834yrhewyr8rwfw').then((house) =>{
+House.findById('yruwhu382ru32').then((house) =>{
     house?.bathrooms
     house?.bathrooms
     house?.washrooms

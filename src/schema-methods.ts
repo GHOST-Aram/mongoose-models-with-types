@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, Schema, model } from "mongoose"
+import mongoose, { HydratedDocument } from "mongoose"
 
 interface IUser{
     first_name: string
@@ -29,10 +29,10 @@ interface IUserMethods{
  *  that that defines the custom instance methods that 
  * the User model in suppossed to implement
  */
-type UserModel = Model<IUser,{}, IUserMethods>
+type UserModel = mongoose.Model<IUser,{}, IUserMethods>
 
 
-const userSchema: Schema = new Schema<
+const userSchema: mongoose.Schema = new mongoose.Schema<
 IUser, UserModel, IUserMethods>({
     first_name: {
         type: String,
@@ -55,10 +55,13 @@ userSchema.method('full_name', function(){
 userSchema.method('to_string', function(){
     return `Name: ${this.full_name()}  email: ${this.email}`
 })
-const User: UserModel = model<IUser, UserModel>(
-    'User', userSchema) 
 
-const user = new User({
+const User: UserModel = mongoose.model<IUser, UserModel>(
+'User', userSchema) 
+
+type HydratedUserDoc = HydratedDocument<IUser, IUserMethods>
+
+const user: HydratedUserDoc = new User({
     first_name: 'Erick',
     last_name: 'Bret',
     email: 'erickbret@gmail.com',
@@ -67,7 +70,7 @@ const user = new User({
 const fullName = user.full_name()
 
 
-const identify = (doc: HydratedDocument<IUser, IUserMethods>) =>{
+const identify = (doc: HydratedUserDoc) =>{
 
     // You can access all document properties 
     // and instance methods by including their interfaces as Generics
