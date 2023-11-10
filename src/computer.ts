@@ -40,9 +40,12 @@ IComputer,ComputerModel,ComputerMethods,{},ComputerVirtuals>({
     year_made: {
         type: Number,
         required: true
-}
+    },
+    
 })
 
+const Computer = mongoose.model<IComputer,ComputerModel>(
+    'Computer', computerSchema) 
 computerSchema.method('getFullName', function():string {
     return `${this.manufacturer} ${this.model_name} ${this.model_number}`
 })
@@ -50,8 +53,7 @@ computerSchema.virtual('age').get(function():number{
     return new Date().getFullYear() - this.year_made
 })
 
-const Computer = mongoose.model<IComputer,ComputerModel>(
-    'Computer', computerSchema) 
+
 
 type HydratedComputerDoc = mongoose.HydratedDocument<
 IComputer, ComputerVirtuals & ComputerMethods>
@@ -59,18 +61,19 @@ IComputer, ComputerVirtuals & ComputerMethods>
 
 //Create an instance of Computer Document
 // The Computer Model returns a HydratedDocument
-const desktop:HydratedComputerDoc = new Computer({
+const desktop = new Computer({
     year_made: 2002,
     model_name: 'P40',
     serial_number: '54385yuhefewy8rwhwu',
     manufacturer: 'Lenovo',
-    model_number: 'rxd 456'
+    model_number: 'rxd 456',
+
 }) 
 
 console.log(desktop.age, " years")
 console.log(desktop.model_name)
 console.log(desktop.manufacturer)
 console.log(desktop.id)
-console.log(desktop.__v)
+// console.log(desktop.__v)
 console.log(desktop._id)
 console.log("Full Name :",desktop.getFullName())
