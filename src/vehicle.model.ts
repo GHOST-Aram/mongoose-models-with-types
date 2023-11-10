@@ -11,10 +11,15 @@ interface IVehicle{
 interface VehicleMethods{
     calculateAge:(year: number) => number
 }
-type VehicleModel = Model<IVehicle, {}, VehicleMethods>
 
-const vehicleSchema = new Schema<
-IVehicle, VehicleModel, VehicleMethods>({
+interface VehicleVirtuals{
+    long_name: string
+}
+type VehicleModel = Model<IVehicle, {}, VehicleMethods, 
+VehicleVirtuals>
+
+const vehicleSchema: Schema = new Schema<
+IVehicle, VehicleModel, VehicleMethods, {}, VehicleVirtuals>({
     make: { type: String },
     vehicle_model: { type: String },
     manufacturer: { type: String },
@@ -25,9 +30,14 @@ IVehicle, VehicleModel, VehicleMethods>({
 vehicleSchema.method('calculateAge', function(year:number):number{
     return year- this.year_sold
 })
+
+vehicleSchema.virtual('long_name').get(function():string{
+    return `${this.make} ${this.vehicle_model} ${this.year_sold}`
+})
 const Vehicle: VehicleModel = model<IVehicle, VehicleModel>('Vehicle', vehicleSchema)
 
-const car: HydratedDocument<IVehicle, VehicleMethods> = new Vehicle({
+type HydratedVehicleDoc = HydratedDocument<IVehicle, VehicleMethods & VehicleVirtuals>
+const car: HydratedVehicleDoc  = new Vehicle({
     make: 'Toyota',
     vehicle_model: 'Corrolla',
     manufacturer: 'Toyota Motors',
@@ -43,8 +53,11 @@ const logVehicleData = (vehicle: HydratedDocument<IVehicle, VehicleMethods>): vo
     console.log("Manufacturer: ", vehicle.manufacturer)
     console.log("Deign: ", vehicle.design)
     console.log("Year sold: ", car.year_sold)
+    console.log('Long Name: ', car.long_name)
 }
 
 // logVehicleData(car)
+console.log("Long Name: ",car.long_name)
 
-console.log("Age by 2034: ", car.calculateAge(2034))
+
+// console.log("Age by 2034: ", car.calculateAge(2034))
