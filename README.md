@@ -142,7 +142,6 @@ To create a vehicle model, we need the `model` function from mongoose.
 
 ```
 import { model } from "mongoose"
-
 ```
 Then we supply the `IVehicle` interface and `VehicleModel` to the function as generic types. The `IVehicle` interface goes at the first position.  The `VehicleModel` type goes at the second position. The code snipper is as follows:
 
