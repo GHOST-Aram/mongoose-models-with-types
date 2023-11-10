@@ -50,30 +50,36 @@ Additionally, having basic prior knowledge on the following features of `mongoos
 Now that you know what you expect to learn from this article and the prerequisites, let us look at how we are going to learn. 
 The learning activities in this article will be carried out in the following segments: 
 
-- Creating a simple model.
-- Creating a model with custom instance methods.
-- Creating a model with virtual properties.
-- Creating a model with both custom instance methods and virtual properties.
+1. Creating a simple model.
+2. Creating a model with custom instance methods.
+3. Creating a model with virtual properties.
+4. Creating a model with both custom instance methods and virtual properties.
 
 With the introduction out of the way, lets begining by looking at how to create a simple model.
 
-## Creating a simple model.
+## 1. Creating a simple model.
 In this section we will create a simple model with only a few explicit properties. This model will not have any virtual property or custom instance method. To make the most out of this section, will create a `Vehicle` model. This model will have the following data properties:
 
 - make
 - model
 - manufacturer
 - design
+- year-sold
 
 To create a simple model, we will follow the following procedure:
 
-1. Define an  interface with the `Vehicle` properties.
-2. Create a schema for the `Vehicle` model.
-3. Create the `Vehicle` model.
-4. Create a document of the `Vehicle` model. 
-5. Test the types and properties of the document.
+a). Define an  interface with the `Vehicle` properties.
 
-### 1. Creating an Interface with Vehicle properties.
+b). Create a schema for the `Vehicle` model.
+
+c). Create the `Vehicle` model.
+
+d). Create a document of the `Vehicle` model. 
+
+e). Test the types and properties of the document.
+
+
+### a). Define an Interface with Vehicle properties.
 Creating an interface for our model will help us ensure that we only include the intended properties when defining the vehicle schema in the next step. 
 
 Here is the implementation of the interface:
@@ -84,11 +90,12 @@ interface IVehicle{
     vehicle_model: string
     manufacturer: string
     design: string
+    year_sold: number
 }
 ```
 With the interface define, let us it to create the schema in the next step.
 
-### 2. Create a Schema for the Vehicle model.
+### b). Create a Schema for the Vehicle model.
 In the previous section, we defined a schema that dictates what data members should exist in the schema. In this step we create an instace of `Schema` class that implements the `Ivehicle` interface. 
 
 To create create an new vehicle schema, we need to import the `Schema` constructor from `mongoose` as follows:
@@ -121,12 +128,13 @@ const vehicleSchema = new Schema<IVehicle, VehicleModel>({
     vehicle_model: { type: String },
     manufacturer: { type: String },
     design: { type: String }
+    year_sold: {type: Number }
 })
 ```
 
 We have successfully created a type sensitive vehicle schema. We will create the vehicle model in the next step.
 
-### 3. Create the Vehicle Model.
+### c). Create the Vehicle Model.
 In step 2, we created a Typescript supported vehicle schema. Let us extend that support to the vehicle model in this step. 
 
 To create a vehicle model, we need the `model` function from mongoose. 
@@ -143,7 +151,7 @@ const Vehicle: VehicleModel = model<IVehicle, VehicleModel>('Vehicle', vehicleSc
 
 With the model successfully created, let us find out what type of instances can be created from the `Vehicle` model.
 
-### 4. Create a Document of the `Vehicle` Model.
+### d). Create a Document of the `Vehicle` Model.
 The `Vehicle` constructor returns an instance of the `HydratedDocument<IVehicle>` type. 
 
 A `HydratedDocument<IVehicle>` is a Mongoose document that has all the properties, types and other Mongoose features that exists on instance of the `Vehicle` model. 
@@ -156,6 +164,7 @@ const car: HydratedDocument<IVehicle> = new Vehicle({
     vehicle_model: 'Corrolla',
     manufacturer: 'Toyota Motors',
     design: 'Sedan',
+    year_sold: 2007
 })
 ```
 
@@ -163,7 +172,7 @@ Mongoose models do not check types of the documents you are creating. The `Vehic
 
 Having created the `car` document, let us see how we can add types to function parameters that expect a mongoose document in the next section.
 
-### 5. Test Types and properties of the Document.
+### e). Test Types and properties of the Document.
 Here, we will create a function that accepts a mongoose document as an argument. The function returns `void`. Our goal is to see that all the data on the document is logged to the console.
 
 We define the function with thw following signature:
@@ -181,6 +190,7 @@ const logVehicleData = (vehicle: HydratedDocument<IVehicle>): void =>{
     console.log("Model: ", vehicle.vehicle_model)
     console.log("Manufacturer: ", vehicle.manufacturer)
     console.log("Design: ", vehicle.design)
+    console.log("Year sold: ", car.year_sold)
 }
 ```
 
@@ -197,3 +207,80 @@ Design:  Sedan
 We have successfully created and tested a simple Mongoose model. In the next section, we will extend the `Vehicle` model with custom instance methods.
 
 
+## 2. Creating a Model with Instance Methods.
+In this section we will add an instance method to the `Vehicle` model. The method will be accessible to all the instances of the `Vehicle` model.
+
+We will add an instance method that calculates the age of a vehicle from the year it was sold to  given year.
+
+We will extend our previous program in the following order:
+
+a). Define interface for instance methods.
+
+b). Add the interface to `Model` and `Schema` generics list.
+
+c). Extend the `HydratedDocument` type.
+
+d). Impelement the method defined in the interface.
+
+e). Test the instance method
+
+### a). Define interface for instance methods.
+To add instance methods with Typescript support to a schema, we first define an interface for instance methods. The interface is defined below.
+
+```
+interface VehicleMethods{
+    calculateAge:(year: number) => number
+}
+```
+
+### b). Add the interface to `Model` and `Schema` generics list.
+We add the `VehicleMethods` interface as a 3rd generic to the `Model` and as a 3rd generic to Schema constructor as in the code below:
+
+```
+type VehicleModel = Model<IVehicle, {}, VehicleMethods>
+
+const vehicleSchema = new Schema<IVehicle, VehicleModel, VehicleMethods>({
+    make: { type: String },
+    vehicle_model: { type: String },
+    manufacturer: { type: String },
+    design: { type: String },
+    year_sold:{ type: Number}
+})
+```
+### c). Extend the `HydratedDocument` type.
+Here, we add `VehicleMethods` to the `HydratedDocument` type as the 2nd argument to make the methods visible to the documents.
+
+```
+const car: HydratedDocument<IVehicle, VehicleMethods> = new Vehicle({
+    make: 'Toyota',
+    vehicle_model: 'Corrolla',
+    manufacturer: 'Toyota Motors',
+    design: 'Sedan',
+    year_sold: 2007
+})
+```
+
+At this point if you try to call `car.calculateAge`, it will be available on the list of suggestions. If we try to run the program at his point we will encounter a `TypeError`.This is because the we have not implemented the method in our schema.
+
+### d). Impelement the method defined in the interface.
+Add the instance method to the `vehicleSchema` as shown below:
+
+```
+vehicleSchema.method('calculateAge', function(year:number):number{
+    return year - this.year_sold
+})
+```
+### e). Test the instance method
+Now if you call the method and run your program.
+
+```
+console.log("Age by 2034: ", car.calculateAge(2034))
+```
+You will get an output without errors.
+
+```
+//Expecte output
+Age by 2034:  27
+```
+
+That's all for the instance methods. Let us see what's next on virtual properties.
