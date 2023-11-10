@@ -55,3 +55,145 @@ The learning activities in this article will be carried out in the following seg
 - Creating a model with virtual properties.
 - Creating a model with both custom instance methods and virtual properties.
 
+With the introduction out of the way, lets begining by looking at how to create a simple model.
+
+## Creating a simple model.
+In this section we will create a simple model with only a few explicit properties. This model will not have any virtual property or custom instance method. To make the most out of this section, will create a `Vehicle` model. This model will have the following data properties:
+
+- make
+- model
+- manufacturer
+- design
+
+To create a simple model, we will follow the following procedure:
+
+1. Define an  interface with the `Vehicle` properties.
+2. Create a schema for the `Vehicle` model.
+3. Create the `Vehicle` model.
+4. Create a document of the `Vehicle` model. 
+5. Test the types and properties of the document.
+
+### 1. Creating an Interface with Vehicle properties.
+Creating an interface for our model will help us ensure that we only include the intended properties when defining the vehicle schema in the next step. 
+
+Here is the implementation of the interface:
+
+```
+interface IVehicle{
+    make: string
+    vehicle_model: string
+    manufacturer: string
+    design: string
+}
+```
+With the interface define, let us it to create the schema in the next step.
+
+### 2. Create a Schema for the Vehicle model.
+In the previous section, we defined a schema that dictates what data members should exist in the schema. In this step we create an instace of `Schema` class that implements the `Ivehicle` interface. 
+
+To create create an new vehicle schema, we need to import the `Schema` constructor from `mongoose` as follows:
+
+```
+import { Schema } from "mongoose"
+```
+
+To add Typescript support to the new vehicle schema, we will supply the `IVehicle` interface as the first generic to the `Schema` constructor as follows:
+
+```
+const vehicleSchema = new Schema<IVehicle>({})
+```
+The `Schema` constructor also accepts a generic type of the `Model` as follows:
+
+```
+import { Model } from 'mongoose'
+```
+
+```
+type VehicleModel = Model<IVehicle> 
+const vehicleSchema = new Schema<IVehicle, VehicleModel>({})
+```
+
+After adding the types, the schema is defined just like a plain JavaScript schema. The code snippet is provided below.
+
+```
+const vehicleSchema = new Schema<IVehicle, VehicleModel>({
+    make: { type: String },
+    vehicle_model: { type: String },
+    manufacturer: { type: String },
+    design: { type: String }
+})
+```
+
+We have successfully created a type sensitive vehicle schema. We will create the vehicle model in the next step.
+
+### 3. Create the Vehicle Model.
+In step 2, we created a Typescript supported vehicle schema. Let us extend that support to the vehicle model in this step. 
+
+To create a vehicle model, we need the `model` function from mongoose. 
+
+```
+import { model } from "mongoose"
+
+```
+Then we supply the `IVehicle` interface and `VehicleModel` to the function as generic types. The `IVehicle` interface goes at the first position.  The `VehicleModel` type goes at the second position. The code snipper is as follows:
+
+```
+const Vehicle: VehicleModel = model<IVehicle, VehicleModel>('Vehicle', vehicleSchema)
+```
+
+With the model successfully created, let us find out what type of instances can be created from the `Vehicle` model.
+
+### 4. Create a Document of the `Vehicle` Model.
+The `Vehicle` constructor returns an instance of the `HydratedDocument<IVehicle>` type. 
+
+A `HydratedDocument<IVehicle>` is a Mongoose document that has all the properties, types and other Mongoose features that exists on instance of the `Vehicle` model. 
+
+Below is an example of how to create a vehicle document:
+
+```
+const car: HydratedDocument<IVehicle> = new Vehicle({
+    make: 'Toyota',
+    vehicle_model: 'Corrolla',
+    manufacturer: 'Toyota Motors',
+    design: 'Sedan',
+})
+```
+
+Mongoose models do not check types of the documents you are creating. The `Vehicle` model will therefore not warn you if you attempt to add an extra property or assign a wrong type. 
+
+Having created the `car` document, let us see how we can add types to function parameters that expect a mongoose document in the next section.
+
+### 5. Test Types and properties of the Document.
+Here, we will create a function that accepts a mongoose document as an argument. The function returns `void`. Our goal is to see that all the data on the document is logged to the console.
+
+We define the function with thw following signature:
+
+```
+const logVehicleData = (vehicle: HydratedDocument<IVehicle>): void =>{
+   //todo here 
+}
+```
+
+The we implement the function as follows:
+```
+const logVehicleData = (vehicle: HydratedDocument<IVehicle>): void =>{
+    console.log("Make: ", vehicle.make)
+    console.log("Model: ", vehicle.vehicle_model)
+    console.log("Manufacturer: ", vehicle.manufacturer)
+    console.log("Design: ", vehicle.design)
+}
+```
+
+Finally, we call the function and run our program to see the ouput.
+
+```
+//Expected output
+Make:  Toyota
+Model:  Corrolla
+Manufacturer:  Toyota Motors
+Design:  Sedan
+```
+
+We have successfully created and tested a simple Mongoose model. In the next section, we will extend the `Vehicle` model with custom instance methods.
+
+
