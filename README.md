@@ -392,5 +392,5 @@ In conclusion, We have learnt how to do the following:
 - Create a Mongoose model with typed virtual properties.
 - Create a Mongoose mode with both typed custom instance methods and virtual properties.
 
-Congratulations for finishing this exercise. All the code we have writen plus other more examples on the same topic are available on [this repository.]() All the best in your development journey. 
+Congratulations for finishing this exercise. All the code we have writen plus other more examples on the same topic are available on [this repository.](https://github.com/GHOST-Aram/mongoose-models-with-types) All the best in your development journey. 
 
